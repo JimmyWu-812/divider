@@ -17,6 +17,8 @@ wire o_out_valid_res;
 wire [50:0] numbers [0:8];
 wire [7:0] intmdt_r [5:0];
 wire [7:0] o_q_res;
+wire inv_o_q_res_0;
+wire [1:0] tmp;
 
 STAGE1 stage1(i_a[7], i_b, o_q[7], intmdt_r[7][0], numbers[0]);
 STAGE2 stage2({intmdt_r[7][0], i_a[6]}, i_b, o_q_res[6], intmdt_r[6][1:0], numbers[1]);
@@ -26,6 +28,11 @@ STAGE5 stage5({intmdt_r[4][3:0], i_a[3]}, i_b, o_q_res[3], intmdt_r[3][4:0], num
 STAGE678 stage6({intmdt_r[3][4:0], i_a[2]}, i_b, o_q_res[2], intmdt_r[2], numbers[5]);
 STAGE678 stage7({intmdt_r[2][4:0], i_a[1]}, i_b, o_q_res[1], intmdt_r[1], numbers[6]);
 STAGE678 stage8({intmdt_r[1][4:0], i_a[0]}, i_b, o_q_res[0], intmdt_r[0], numbers[7]);
+
+IV iv1(inv_o_q_res_0, o_q_res[0], numbers[8]);
+ND2 nd1(tmp[0], o_q_res[0], i_in_valid);
+ND2 nd2(tmp[1], inv_o_q_res_0, i_in_valid);
+ND2 nd2(o_out_valid_res, tmp[0], tmp[1]);
 
 REGP#(14) result(clk, rst_n, {o_q, intmdt_r[0], o_out_valid_res}, {o_q, o_r, o_out_valid}, number);
 
