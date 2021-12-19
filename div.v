@@ -14,10 +14,10 @@ module div (
 );
 
 wire o_out_valid_res;
-wire [50:0] numbers [0:12];
+wire [50:0] numbers [0:13];
 wire [4:0] intmdt_r [7:0];
 wire [7:0] o_q_res;
-wire inv_o_q_res_0;
+wire inv_tmp, tmp;
 
 STAGE1 stage1(i_a[7], i_b, o_q_res[7], intmdt_r[7][0], numbers[0]);
 STAGE2 stage2({intmdt_r[7][0], i_a[6]}, i_b, o_q_res[6], intmdt_r[6][1:0], numbers[1]);
@@ -28,18 +28,19 @@ STAGE678 stage6({intmdt_r[3], i_a[2]}, i_b, o_q_res[2], intmdt_r[2], numbers[5])
 STAGE678 stage7({intmdt_r[2], i_a[1]}, i_b, o_q_res[1], intmdt_r[1], numbers[6]);
 STAGE678 stage8({intmdt_r[1], i_a[0]}, i_b, o_q_res[0], intmdt_r[0], numbers[7]);
 
-IV iv1(inv_o_q_res_0, o_q_res[0], numbers[8]);
-OR2 nd1(o_out_valid_res, inv_o_q_res_0, o_q_res[0], numbers[9]);
+AN2 an1(tmp, o_q_res[0], intmdt_r[0][4], numbers[8]);
+ND2 nd1(inv_tmp, o_q_res[0], intmdt_r[0][4], numbers[9]);
+ND2 nd2(o_out_valid_res, tmp, inv_tmp, numbers[10]);
 
-REGP#(8) quotient(clk, rst_n, o_q, o_q_res, numbers[10]);
-REGP#(5) remainder(clk, rst_n, o_r, intmdt_r[0], numbers[11]);
-REGP#(1) valid(clk, rst_n, o_out_valid, o_out_valid_res, numbers[12]);
+REGP#(8) quotient(clk, rst_n, o_q, o_q_res, numbers[11]);
+REGP#(5) remainder(clk, rst_n, o_r, intmdt_r[0], numbers[12]);
+REGP#(1) valid(clk, rst_n, o_out_valid, o_out_valid_res, numbers[13]);
 
 reg [50:0] sum;
 integer j;
 always @(*) begin
 	sum = 0;
-	for (j=0; j<13; j=j+1) begin 
+	for (j=0; j<14; j=j+1) begin 
 		sum = sum + numbers[j];
 	end
 end
