@@ -14,7 +14,7 @@ module div (
 );
 
 wire o_out_valid_res;
-wire [50:0] numbers [0:13];
+wire [50:0] numbers [0:11];
 wire [4:0] intmdt_r [7:0];
 wire [7:0] o_q_res;
 wire inv_tmp, tmp;
@@ -32,15 +32,13 @@ AN2 an1(tmp, o_q_res[0], intmdt_r[0][4], numbers[8]);
 ND2 nd1(inv_tmp, o_q_res[0], intmdt_r[0][4], numbers[9]);
 ND2 nd2(o_out_valid_res, tmp, inv_tmp, numbers[10]);
 
-REGP#(8) quotient(clk, rst_n, o_q, o_q_res, numbers[11]);
-REGP#(5) remainder(clk, rst_n, o_r, intmdt_r[0], numbers[12]);
-REGP#(1) valid(clk, rst_n, o_out_valid, o_out_valid_res, numbers[13]);
+REGP#(14) quotient(clk, rst_n, {o_q, o_r, o_out_valid}, {o_q_res, intmdt_r[0], o_out_valid_res}, numbers[11]);
 
 reg [50:0] sum;
 integer j;
 always @(*) begin
 	sum = 0;
-	for (j=0; j<14; j=j+1) begin 
+	for (j=0; j<12; j=j+1) begin 
 		sum = sum + numbers[j];
 	end
 end
