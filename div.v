@@ -1,5 +1,54 @@
 /****************************************
-*                 div                   *
+*            recursive div              *
+****************************************/
+// module div (
+// 	input  clk,
+// 	input  rst_n,
+// 	input  i_in_valid,
+// 	input  [7:0] i_a,
+// 	input  [4:0] i_b,
+// 	output [7:0] o_q,
+// 	output [4:0] o_r,
+// 	output       o_out_valid,
+// 	output [50:0] number
+// );
+
+// wire o_out_valid_res;
+// wire [50:0] numbers [0:11];
+// wire [4:0] intmdt_r [7:0];
+// wire [7:0] o_q_res;
+// wire inv_tmp, tmp;
+
+// STAGE1 stage1(i_a[7], i_b, o_q_res[7], intmdt_r[7][0], numbers[0]);
+// STAGE2 stage2({intmdt_r[7][0], i_a[6]}, i_b, o_q_res[6], intmdt_r[6][1:0], numbers[1]);
+// STAGE3 stage3({intmdt_r[6][1:0], i_a[5]}, i_b, o_q_res[5], intmdt_r[5][2:0], numbers[2]);
+// STAGE4 stage4({intmdt_r[5][2:0], i_a[4]}, i_b, o_q_res[4], intmdt_r[4][3:0], numbers[3]);
+// STAGE5 stage5({intmdt_r[4][3:0], i_a[3]}, i_b, o_q_res[3], intmdt_r[3], numbers[4]);
+// STAGE678 stage6({intmdt_r[3], i_a[2]}, i_b, o_q_res[2], intmdt_r[2], numbers[5]);
+// STAGE678 stage7({intmdt_r[2], i_a[1]}, i_b, o_q_res[1], intmdt_r[1], numbers[6]);
+// STAGE678 stage8({intmdt_r[1], i_a[0]}, i_b, o_q_res[0], intmdt_r[0], numbers[7]);
+
+// AN2 an1(tmp, o_q_res[0], intmdt_r[0][4], numbers[8]);
+// ND2 nd1(inv_tmp, o_q_res[0], intmdt_r[0][4], numbers[9]);
+// ND2 nd2(o_out_valid_res, tmp, inv_tmp, numbers[10]);
+
+// REGP#(14) quotient(clk, rst_n, {o_q, o_r, o_out_valid}, {o_q_res, intmdt_r[0], o_out_valid_res}, numbers[11]);
+
+// reg [50:0] sum;
+// integer j;
+// always @(*) begin
+// 	sum = 0;
+// 	for (j=0; j<12; j=j+1) begin 
+// 		sum = sum + numbers[j];
+// 	end
+// end
+
+// assign number = sum;
+
+// endmodule
+
+/****************************************
+*            pipelined div              *
 ****************************************/
 module div (
 	input  clk,
@@ -13,32 +62,56 @@ module div (
 	output [50:0] number
 );
 
-wire o_out_valid_res;
-wire [50:0] numbers [0:11];
-wire [4:0] intmdt_r [7:0];
-wire [7:0] o_q_res;
-wire inv_tmp, tmp;
+wire [50:0] numbers [0:14];
 
-STAGE1 stage1(i_a[7], i_b, o_q_res[7], intmdt_r[7][0], numbers[0]);
-STAGE2 stage2({intmdt_r[7][0], i_a[6]}, i_b, o_q_res[6], intmdt_r[6][1:0], numbers[1]);
-STAGE3 stage3({intmdt_r[6][1:0], i_a[5]}, i_b, o_q_res[5], intmdt_r[5][2:0], numbers[2]);
-STAGE4 stage4({intmdt_r[5][2:0], i_a[4]}, i_b, o_q_res[4], intmdt_r[4][3:0], numbers[3]);
-STAGE5 stage5({intmdt_r[4][3:0], i_a[3]}, i_b, o_q_res[3], intmdt_r[3], numbers[4]);
-STAGE678 stage6({intmdt_r[3], i_a[2]}, i_b, o_q_res[2], intmdt_r[2], numbers[5]);
-STAGE678 stage7({intmdt_r[2], i_a[1]}, i_b, o_q_res[1], intmdt_r[1], numbers[6]);
-STAGE678 stage8({intmdt_r[1], i_a[0]}, i_b, o_q_res[0], intmdt_r[0], numbers[7]);
+wire [7:0] q;
+wire [1:0] q7_6;
+wire [2:0] q7_5;
+wire [3:0] q7_4;
+wire [4:0] q7_3;
+wire [5:0] q7_2;
+wire [6:0] q7_1;
+wire r1;
+wire [1:0] r2_2, r2_3;
+wire [2:0] r3_3, r3_4;
+wire [3:0] r4_4, r4_5;
+wire [4:0] r5_5, r5_6, r6_6, r6_7, r7_7, r7_8, r8_8;
+wire [5:0] a3;
+wire [4:0] a4;
+wire [3:0] a5;
+wire [2:0] a6;
+wire [1:0] a7;
+wire a8;
+wire [5:0] b [3:8];
+wire out_valid [3:8];
 
-AN2 an1(tmp, o_q_res[0], intmdt_r[0][4], numbers[8]);
-ND2 nd1(inv_tmp, o_q_res[0], intmdt_r[0][4], numbers[9]);
-ND2 nd2(o_out_valid_res, tmp, inv_tmp, numbers[10]);
+STAGE1 stage1(i_a[7], i_b, q[7], r1, numbers[0]);
+STAGE2 stage2({r1, i_a[6]}, i_b, q[6], r2_2, numbers[1]);
+REGP#(16) reg2_3(clk, rst_n, {out_valid[3], a3, b[3], q7_6, r2_3}, {i_in_valid, i_a[5:0], i_b, {q[7], q[6]}, r2_2}, numbers[2]);
 
-REGP#(14) quotient(clk, rst_n, {o_q, o_r, o_out_valid}, {o_q_res, intmdt_r[0], o_out_valid_res}, numbers[11]);
+STAGE3 stage3({r2_3, a3[5]}, b[3], q[5], r3_3, numbers[3]);
+REGP#(17) reg3_4(clk, rst_n, {out_valid[4], a4, b[4], q7_5, r3_4}, {out_valid[3], a3[4:0], b[3], {q7_6, q[5]}, r3_3}, numbers[4]);
+
+STAGE4 stage4({r3_4, a4[4]}, b[4], q[4], r4_4, numbers[5]);
+REGP#(18) reg4_5(clk, rst_n, {out_valid[5], a5, b[5], q7_4, r4_5}, {out_valid[4], a4[3:0], b[4], {q7_5, q[4]}, r4_4}, numbers[6]);
+
+STAGE5 stage5({r4_5, a5[3]}, b[5], q[3], r5_5, numbers[7]);
+REGP#(19) reg5_6(clk, rst_n, {out_valid[6], a6, b[6], q7_3, r5_6}, {out_valid[5], a5[2:0], b[5], {q7_4, q[4]}, r5_5}, numbers[8]);
+
+STAGE678 stage6({r5_6, a6[2]}, b[6], q[2], r6_6, numbers[9]);
+REGP#(19) reg5_6(clk, rst_n, {out_valid[7], a7, b[7], q7_2, r6_7}, {out_valid[6], a6[1:0], b[6], {q7_3, q[2]}, r6_6}, numbers[10]);
+
+STAGE678 stage7({r6_7, a7[1]}, b[7], q[1], r7_7, numbers[11]);
+REGP#(19) reg5_6(clk, rst_n, {out_valid[8], a8, b[8], q7_1, r7_8}, {out_valid[7], a7[0], b[7], {q7_2, q[1]}, r7_7}, numbers[12]);
+
+STAGE678 stage8({r7_8, a8[0]}, b[8], q[0], r8_8, numbers[13]);
+REGP#(14) reg5_6(clk, rst_n, {o_out_valid, o_q, o_r}, {out_valid[8], {q7_1, q[0]}, r8_8}, numbers[14]);
 
 reg [50:0] sum;
 integer j;
 always @(*) begin
 	sum = 0;
-	for (j=0; j<12; j=j+1) begin 
+	for (j=0; j<15; j=j+1) begin 
 		sum = sum + numbers[j];
 	end
 end
