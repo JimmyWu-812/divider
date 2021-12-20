@@ -46,7 +46,7 @@ NR2 nr3(n7, n3, r8[3], numbers[14]);
 NR2 nr4(n8, n4, r8[2], numbers[15]);
 NR4 nr5(out_valid, n5, n6, n7, n8, numbers[16]);
 
-REGP#(14) quotient(clk, rst_n, {o_q, o_r, o_out_valid}, {q, r8, out_valid}, numbers[17]);
+REGP#(14) result(clk, rst_n, {o_q, o_r, o_out_valid}, {q, r8, out_valid}, numbers[17]);
 
 reg [50:0] sum;
 integer j;
@@ -413,27 +413,21 @@ module FS1(
 	output [50:0] number
 );
 
-wire inv_a;
-wire [2:0] prod;
-wire [50:0] numbers [0:6];
-// wire [50:0] numbers [0:5];
-wire tmp;
+wire [50:0] numbers [0:5];
+wire [3:0] tmp;
 
-IV iv1(inv_a, i_a, numbers[0]);
-ND2 nd1(prod[0], inv_a, i_b, numbers[1]);
-ND2 nd2(prod[1], i_b, i_borrow, numbers[2]);
-ND2 nd3(prod[2], inv_a, i_borrow, numbers[3]);
-ND3 nd4(o_borrow, prod[0], prod[1], prod[2], numbers[4]);
-EO eo1(tmp, i_a, i_b, numbers[5]);
-EO eo2(o_diff, tmp, i_borrow, numbers[6]);
-// EO3 eo1(o_diff, i_a, i_b, i_borrow, numbers[5]);
+ND2 nd1(tmp[0], i_b, i_borrow, numbers[0]);
+EO eo1(tmp[1], i_b, i_borrow, numbers[1]);
+EO eo2(o_diff, tmp[1], i_a, numbers[2]);
+IV iv1(tmp[2], i_a, numbers[3]);
+ND2 nd2(tmp[3], tmp[1], tmp[2], numbers[4]);
+ND2 nd3(o_borrow, tmp[0], tmp[3], numbers[5]);
 
 reg [50:0] sum;
 integer j;
 always @(*) begin
 	sum = 0;
-	for (j=0; j<7; j=j+1) begin 
-	// for (j=0; j<6; j=j+1) begin 
+	for (j=0; j<6; j=j+1) begin 
 		sum = sum + numbers[j];
 	end
 end
