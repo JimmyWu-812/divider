@@ -402,7 +402,7 @@ assign number = sum;
 endmodule
 
 /****************************************
-*                  FS1                  *
+*             recursive FS1             *
 ****************************************/
 module FS1(
 	input i_a,
@@ -435,6 +435,42 @@ end
 assign number = sum;
 
 endmodule
+
+/****************************************
+*             pipelined FS1             *
+****************************************/
+// module FS1(
+// 	input i_a,
+// 	input i_b,
+// 	input i_borrow,
+// 	output o_diff,
+// 	output o_borrow,
+// 	output [50:0] number
+// );
+
+// wire inv_a;
+// wire [2:0] prod;
+// wire [50:0] numbers [0:5];
+
+// IV iv1(inv_a, i_a, numbers[0]);
+// ND2 nd1(prod[0], inv_a, i_b, numbers[1]);
+// ND2 nd2(prod[1], i_b, i_borrow, numbers[2]);
+// ND2 nd3(prod[2], inv_a, i_borrow, numbers[3]);
+// ND3 nd4(o_borrow, prod[0], prod[1], prod[2], numbers[4]);
+// EO3 eo1(o_diff, i_a, i_b, i_borrow, numbers[5]);
+
+// reg [50:0] sum;
+// integer j;
+// always @(*) begin
+// 	sum = 0;
+// 	for (j=0; j<6; j=j+1) begin 
+// 		sum = sum + numbers[j];
+// 	end
+// end
+
+// assign number = sum;
+
+// endmodule
 
 /****************************************
 *              BW-bit FS1               *
