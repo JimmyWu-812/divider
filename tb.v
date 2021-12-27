@@ -152,7 +152,7 @@ initial begin
 	$display("\n\033[1;96m=============================================");
 	$display("                   Summary                   ");
 	$display("=============================================");
-	$display("  	Clock cycle:           %.1f ns", `CYCLE);
+	$display("  	Clock cycle:           %.3f ns", `CYCLE);
 	$display("  	Number of transistors: %.0f", $itor(number));
 	$display("  	Total excution cycle:  %.0f", $itor(total_latency));
 	$display("  	Correctness Score:     %.1f", 40.0 * $itor($itor(`PATTERN) - $itor(err_num)) / $itor(`PATTERN));
@@ -214,7 +214,7 @@ initial begin
 	$display("\n\033[1;96m=============================================");
 	$display("                   Summary                   ");
 	$display("=============================================");
-	$display("  	Clock cycle:           %.1f ns", `CYCLE);
+	$display("  	Clock cycle:           %.3f ns", `CYCLE);
 	$display("  	Number of transistors: %.0f", $itor(number));
 	$display("  	Total excution cycle:  %.0f", $itor(total_latency));
 	$display("  	Correctness Score:     %.1f", 40.0 * $itor($itor(`PATTERN) - $itor(err_num)) / $itor(`PATTERN));
